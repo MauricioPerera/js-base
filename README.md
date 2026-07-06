@@ -15,6 +15,12 @@ responder búsquedas por similitud vectorial o híbrida (vector + BM25) sin ning
 servicio externo. Su alcance es un solo proceso (1 escritor + N lectores), pensado
 para apps chicas/medianas y agentes.
 
+![Demo: búsqueda semántica por HTTP devolviendo resultados rankeados por similitud coseno](docs/media/semantic-search-demo.gif)
+
+> Búsqueda semántica real sobre HTTP: un `POST .../search` con un vector devuelve
+> los documentos rankeados por similitud. Los scores del demo son los que produce
+> el motor (verificados end-to-end).
+
 ## Correr el servidor
 
 ```bash
