@@ -12,7 +12,7 @@
 // Arquitectura: knowledge/architecture/js-base.md.
 
 module.exports = {
-  VERSION: "0.1.1",
+  VERSION: "0.1.2",
   store: require("./vendor/js-store/index.js"),
   createServer: require("./app.js").createServer,
 };

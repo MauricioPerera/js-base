@@ -3,6 +3,15 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.2] — 2026-07-06
+
+### Security
+- **Re-vendorizado js-store v0.1.4** (que a su vez re-vendoriza js-doc-store v1.2.1):
+  la comparación del hash de password en `Auth._verifyPassword` ahora es de tiempo
+  constante (antes `===` con early-exit sobre el hash base64 → canal de timing débil).
+  Best-practice de la superficie de auth; hallazgo de la auditoría externa. Manifest
+  sha256 del vendor regenerado.
+
 ## [0.1.1] — 2026-07-06
 
 ### Security

@@ -1,14 +1,14 @@
 {
-  "source": "MauricioPerera/js-store@3cb455e",
-  "version": "0.1.3",
+  "source": "MauricioPerera/js-store@4d3ba04",
+  "version": "0.1.4",
   "files": {
     "LICENSE": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685",
-    "VENDORED.txt": "32110395486401767d19627af681338ffb6f14b00c15f37f9dd478b90d9ec726",
+    "VENDORED.txt": "a3092947dfa6fe06ae24654bc0895e07ac35a54843913bfd6c37d1162bcfffd6",
     "disk-collection.js": "cc4dcf1ab82c3a9c816925c1f4ffe3fb4cab045f97a1330afe2e0e7ff536d708",
     "disk-kv.js": "f2c2c2c67d8ae8d7af1049eeec5445213ffcfe181744a99b1ac07cb02289f264",
     "disk-vectors.js": "3beb3d9fa350be8858b0e3001d5e8bddd38b8f0f8b39352675de092fbd9ae6b8",
     "hybrid-merge.js": "736c09f332d18a575864713d1d694bb9ef985b1b42bc0de1e75423949fefbe6a",
-    "index.js": "92cb3341f7370db59c7316b161b615b17f0a9fcafed71fce056389c51249bca3",
+    "index.js": "6e3aed05a0583edc37dffa7f11222c83ad58033c41e1bf36e52e8b6fdd93f8c2",
     "ivf-disk.js": "2640f961a4b3cd4ae105414f677c715c55ee2c044d999a53c5dc192c851500f6",
     "kmeans.js": "a4bc0c75a494eb629202bd175a2a52ad07a624479b54484b35048b995110a768",
     "lock.js": "c51830b080f29cb3921608a52d20e429e902bcb5b490ee29b5aaf324655327f0",
@@ -17,7 +17,7 @@
     "mmr.js": "9d25bedc0f53c9b9779a07b4ac8b023fd3d207ae157b50c88f25f7035e1d508e",
     "semantic-collection.js": "d8ee728f93a189980027dff248a30011ed6320cb05d5b86a30c5293685f93c2c",
     "validate.js": "75f6051aa734d5e50885eefada9dd38c1248d80dc1f1f31bb56a19c8b528d0ce",
-    "vendor/js-doc-store.js": "d6c2a549aa38f5cb819e6ce6bea379eb537890b5242877c7c198dc7413a42f98",
+    "vendor/js-doc-store.js": "4519d361ec1d5baffc620de3cb17b081249eff2a9f7966543faae7850366077c",
     "vendor/js-vector-store.js": "23741d557ec9271a8873658dae7eb2eb634435bda3b43b203789554af47a38d8",
     "wal.js": "a304ccfba95dabb6c049e8b3ddf64beafeda14b95940394c252cf57ece57f311"
   }
