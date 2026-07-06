@@ -172,13 +172,23 @@ test('(b)(c) auth register+login -> token; records POST con Bearer -> 201; GET l
   } finally { await env.close(); }
 });
 
-test('(d) files: POST binario -> GET byte-identico', async () => {
+test('(d) files: POST binario CON Bearer -> GET byte-identico (lectura pública)', async () => {
   const env = await start();
   try {
+    // La escritura/borrado de '_files' exige auth: registrar+login -> token.
+    const email = `files-${Date.now()}@test.com`;
+    await req(env.origin, 'POST', '/api/auth/register', {
+      body: { email, password: 'password123' },
+    });
+    const login = await req(env.origin, 'POST', '/api/auth/login', {
+      body: { email, password: 'password123' },
+    });
+    const { token } = await json(login);
+
     const payload = Buffer.from([0x00, 0xff, 0x80, 0x7f, 0x01, 0xfe, 0xaa, 0x55, 0xc3, 0x28]);
     const up = await fetch(`${env.origin}/api/files/blob.bin`, {
       method: 'POST',
-      headers: { 'content-type': 'image/png' },
+      headers: { 'content-type': 'image/png', Authorization: `Bearer ${token}` },
       body: payload,
     });
     assert.equal(up.status, 200);
@@ -187,6 +197,7 @@ test('(d) files: POST binario -> GET byte-identico', async () => {
     assert.equal(upJson.size, payload.length);
     assert.equal(upJson.contentType, 'image/png');
 
+    // La LECTURA sigue siendo pública: GET SIN token -> 200 byte-identico.
     const down = await fetch(`${env.origin}/api/files/blob.bin`);
     assert.equal(down.status, 200);
     const buf = Buffer.from(await down.arrayBuffer());

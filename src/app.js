@@ -78,15 +78,20 @@ async function createServer({ dataDir, secret, filesDir } = {}) {
   // prohíbe nombres con '_' inicial via NAME_REGEX). Sin adaptación, todo
   // upload/delete de files quedaría 403 y el server no serviría blobs.
   // El integration layer compone un rules que delega al rules-engine real para
-  // las colecciones de usuario y trata '_files' (reservada, sistema) como
-  // PÚBLICA — consistente con el MVP de files (lectura pública; POST/DELETE
-  // permitivos, igual que defaultRules en tests/files.test.js). No parchea
-  // otros batches: es policy de ensamblaje en este glue. Una tarea futura puede
-  // registrar una policy real para blobs cuando el registry soporte reservadas.
+  // las colecciones de usuario y trata '_files' (reservada, sistema) así:
+  // escritura/borrado (POST/DELETE) EXIGEN usuario autenticado — files.js ya
+  // resuelve el usuario vía authResolver(ctx.token) y lo pasa como `auth` en el
+  // ruleCtx, así que basta con `allow: ctx.auth != null` (deniega anónimo).
+  // La LECTURA (GET /api/files/:name) NO pasa por rules.check: sigue PÚBLICA
+  // (ver files.js, GET sin rules). Esto cierra el DoS de disco / hosting de
+  // contenido arbitrario anónimo que permitía el { allow: true } previo. No
+  // parchea otros batches: es policy de ensamblaje en este glue. Una tarea
+  // futura puede registrar una policy real para blobs cuando el registry soporte
+  // reservadas.
   const baseRules = makeRules(registry);
   const rules = {
     async check(ctx) {
-      if (ctx && ctx.collection === '_files') return { allow: true };
+      if (ctx && ctx.collection === '_files') return { allow: ctx.auth != null };
       return baseRules.check(ctx);
     },
   };

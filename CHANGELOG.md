@@ -3,6 +3,21 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.1] — 2026-07-06
+
+### Security
+- **Files: escritura y borrado ahora exigen autenticación.** `POST`/`DELETE`
+  `/api/files/:name` requieren un usuario autenticado; la lectura (`GET`) sigue pública. El glue de integración trataba la colección de sistema
+  `_files` como pública para toda operación (`{ allow: true }`), lo que permitía subir
+  (hasta 10 MiB) y borrar blobs de forma anónima — un DoS de disco y hosting de contenido
+  arbitrario. Ahora el policy es `allow: ctx.auth != null` para `_files`. Hallazgo de una
+  auditoría externa; test de regresión congelado en `tests/files-auth.test.js`.
+
+### Docs
+- **Límites conocidos** ampliados con dos ítems que faltaban: ausencia de rate limiting /
+  protección de fuerza bruta en `/api/auth/login`, y crecimiento sin límite de `_sessions`
+  (la verificación de token es stateless; las sesiones expiradas no se purgan solas).
+
 ## [0.1.0] — 2026-07-06
 
 Primer MVP: backend embebido estilo PocketBase con búsqueda semántica nativa, en

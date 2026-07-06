@@ -186,8 +186,15 @@ Requisitos: Node ≥18, Python 3.11+. No hay `npm install`: cero dependencias de
 - **`searchHybrid` materializa documentos en RAM** en modo disco (caveat heredado de
   js-store): la búsqueda vectorial pura con IVF sí escala en disco.
 - **Sin admin UI ni OAuth2** en este MVP (solo email/password).
-- **Files**: la lectura es pública; escritura/borrado pasan por reglas, pero la colección
-  de sistema `_files` se trata como pública en el MVP.
+- **Sin rate limiting ni protección de fuerza bruta**: `/api/auth/login` (y el resto de
+  endpoints) se pueden probar sin límite. Poné un reverse proxy con throttling delante
+  para un despliegue expuesto.
+- **Las sesiones crecen sin límite**: cada `login` persiste una fila en `_sessions` y la
+  verificación de token es *stateless* (valida el `exp` del JWT, no la fila); solo `logout`
+  borra. Las sesiones expiradas no se purgan solas — en modo disco solo un `compact()`
+  manual recupera el espacio.
+- **Files**: la lectura (`GET`) es pública; la escritura y el borrado (`POST`/`DELETE`)
+  exigen un usuario autenticado.
 - Las colecciones se definen vía el registro (`CollectionRegistry`); no hay API de
   administración de schema por HTTP en este MVP.
 
