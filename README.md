@@ -2,6 +2,8 @@
 
 Repositorio: **https://github.com/MauricioPerera/js-base**
 
+[![CI](https://github.com/MauricioPerera/js-base/actions/workflows/validate.yml/badge.svg)](https://github.com/MauricioPerera/js-base/actions/workflows/validate.yml)
+
 **Backend embebido estilo PocketBase con búsqueda semántica nativa, en JavaScript
 puro y cero dependencias de runtime.** REST + auth (JWT) + reglas de acceso por
 colección + realtime (SSE) + búsqueda vectorial e híbrida, todo sobre
