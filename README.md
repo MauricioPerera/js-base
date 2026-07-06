@@ -202,6 +202,18 @@ Requisitos: Node ≥18, Python 3.11+. No hay `npm install`: cero dependencias de
 - Las colecciones se definen vía el registro (`CollectionRegistry`); no hay API de
   administración de schema por HTTP en este MVP.
 
+## Proyectos relacionados
+
+js-base es la capa superior de una cadena de librerías embebidas, cero dependencias, de
+[Mauricio Perera](https://github.com/MauricioPerera):
+
+- **[js-store](https://github.com/MauricioPerera/js-store)** — la capa doc+vector que js-base
+  **vendoriza**; provee `SemanticCollection`, el motor de búsqueda semántica.
+- **[js-doc-store](https://github.com/MauricioPerera/js-doc-store)** — el core documental en la base
+  de la cadena (queries Mongo, índices, `Auth` JWT); vendorizado dentro de js-store.
+- **[js-vector-store](https://github.com/MauricioPerera/js-vector-store)** — el core vectorial (IVF,
+  BM25, híbrida); vendorizado dentro de js-store.
+
 ## Licencia
 
 [MIT](LICENSE) © Mauricio Perera. js-store (vendorizado en `src/vendor/js-store/`)
