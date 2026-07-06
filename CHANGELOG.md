@@ -3,6 +3,15 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.5] — 2026-07-06
+
+### Robustez
+- **Re-vendorizado js-store v0.1.7** (cierra los hallazgos H2/H3/H4 de la auditoría de js-store):
+  `serialize()` lanza error de dominio ante un doc sin vector; `search`/`searchHybrid` excluyen
+  hits huérfanos (`doc: null` tras un crash); `checkpoint()` sin snapshotPath lanza error claro en
+  vez de un TypeError de `fs`. Con esto js-base hereda los 7 hallazgos del audit de js-store
+  resueltos. Manifest sha256 regenerado.
+
 ## [0.1.4] — 2026-07-06
 
 ### Security / Robustez

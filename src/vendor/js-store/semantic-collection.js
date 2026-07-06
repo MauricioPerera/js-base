@@ -23,8 +23,13 @@ function resolveOverFetch(limit, overFetch) {
 // Record de persistencia: une un doc (con _id) con su vector plano.
 function recordFromDoc(sc, doc) {
   const id = doc._id;
-  const vector = sc.vectorStore.get(sc.col, id).vector;
-  return { id, doc, vector };
+  const rec = sc.vectorStore.get(sc.col, id);
+  if (rec == null) {
+    throw new Error(
+      `serialize: doc "${id}" no tiene vector asociado (estado inconsistente, posible crash a mitad de upsert/compact; corre compact() o reinserta)`
+    );
+  }
+  return { id, doc, vector: rec.vector };
 }
 
 // Set de ids candidatos cuyo doc existe y matchea el filter. null = sin filtro.
@@ -196,11 +201,13 @@ class SemanticCollection {
     const allowedIds = buildAllowedIds(this.docCollection, candidates, filter);
     const merged = hybridMerge(candidates, allowedIds, limit);
 
-    return merged.map((h) => ({
-      id: h.id,
-      score: h.score,
-      doc: this.docCollection.findById(h.id),
-    }));
+    return merged
+      .map((h) => ({
+        id: h.id,
+        score: h.score,
+        doc: this.docCollection.findById(h.id),
+      }))
+      .filter((r) => r.doc != null); // excluye huerfanos vector-sin-doc (crash a mitad de upsert)
   }
 
   // Búsqueda híbrida texto+vector: fusiona similitud vectorial + BM25 (HybridSearch)
@@ -219,11 +226,13 @@ class SemanticCollection {
     const allowedIds = buildAllowedIds(this.docCollection, candidates, filter);
     const merged = hybridMerge(candidates, allowedIds, limit);
 
-    return merged.map((h) => ({
-      id: h.id,
-      score: h.score,
-      doc: this.docCollection.findById(h.id),
-    }));
+    return merged
+      .map((h) => ({
+        id: h.id,
+        score: h.score,
+        doc: this.docCollection.findById(h.id),
+      }))
+      .filter((r) => r.doc != null); // excluye huerfanos vector-sin-doc (crash a mitad de upsert)
   }
 
   // Lecturas directas: delegan en el core documental. Contrato: semantic-collection-reads.md
@@ -324,6 +333,11 @@ class SemanticCollection {
   }
 
   checkpoint() {
+    if (this.snapshotPath == null) {
+      throw new Error(
+        "checkpoint: no hay snapshotPath (pasa { path } a openDurable para habilitar checkpoint)"
+      );
+    }
     // Snapshot atómico primero, luego truncar el WAL (crash entre ambos = replay idempotente).
     this.saveToFile(this.snapshotPath);
     fs.writeFileSync(this.walPath, "");

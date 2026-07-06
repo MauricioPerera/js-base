@@ -14,7 +14,7 @@ const vectorStore = require("./vendor/js-vector-store.js");
 const { SemanticCollection } = require("./semantic-collection.js");
 
 module.exports = {
-  VERSION: "0.1.6",
+  VERSION: "0.1.7",
   // API de integración de js-store:
   SemanticCollection,
   // Cores vendorizados, expuestos tal cual bajo namespace:
