@@ -15,6 +15,10 @@ responder búsquedas por similitud vectorial o híbrida (vector + BM25) sin ning
 servicio externo. Su alcance es un solo proceso (1 escritor + N lectores), pensado
 para apps chicas/medianas y agentes.
 
+> 📄 **Reporte de análisis** de la jornada (cubre los tres repos de la cadena
+> js-doc-store → js-store → js-base):
+> [`docs/reports/ANALISIS-2026-07-06.md`](docs/reports/ANALISIS-2026-07-06.md).
+
 ![Demo: búsqueda semántica por HTTP devolviendo resultados rankeados por similitud coseno](docs/media/semantic-search-demo.gif)
 
 > Búsqueda semántica real sobre HTTP: un `POST .../search` con un vector devuelve
