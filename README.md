@@ -1,5 +1,28 @@
 # js-base
 
+js-base es un backend estilo PocketBase (REST + auth + rules + SSE + búsqueda
+semántica) construido sobre [js-store](https://github.com/MauricioPerera/js-store),
+con cero dependencias de runtime y metodología KDD. js-store v0.1.2 está vendorizado
+y congelado en `src/vendor/js-store/`; su integridad se verifica por hash en CI.
+
+## Quickstart
+
+```bash
+# JS smoke tests (memoria + persistencia en disco)
+node --test
+
+# Validadores KDD (Python, stdlib — sin npm install)
+python scripts/validate_contracts.py knowledge/contracts
+python scripts/validate_specs.py specs
+python scripts/validate_okf.py knowledge
+
+# Suite Python completa (incluye tests/test_vendor_sync.py)
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+Requisitos: Node ≥18, Python 3.11+. No hay `npm install`: cero dependencias de
+runtime; el vendor y sus tests viven en el repo.
+
 [English](#english) | [Español](#español)
 
 <a id="english"></a>

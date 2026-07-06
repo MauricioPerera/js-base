@@ -8,3 +8,4 @@ Bienvenido a la base de conocimiento del proyecto. El formato de los nodos está
 
 ## Estructura
 - [Contratos de Desarrollo](./contracts/)
+- [Arquitectura](./architecture/)

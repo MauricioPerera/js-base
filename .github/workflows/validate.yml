@@ -29,3 +29,11 @@ jobs:
 
       - name: Assemble context (smoke)
         run: python scripts/assemble_context.py ccdd/context.json "smoke"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run JS tests
+        run: npm test
