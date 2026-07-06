@@ -1,1 +1,1 @@
-js-store @ bf253e2 (v0.1.5) — vendored 2026-07-06. DO NOT edit here: update by re-vendoring.
+js-store @ fd30155 (v0.1.6) — vendored 2026-07-06. DO NOT edit here: update by re-vendoring.

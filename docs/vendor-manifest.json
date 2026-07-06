@@ -1,24 +1,24 @@
 {
-  "source": "MauricioPerera/js-store@bf253e2",
-  "version": "0.1.5",
+  "source": "MauricioPerera/js-store@fd30155",
+  "version": "0.1.6",
   "files": {
     "LICENSE": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685",
-    "VENDORED.txt": "8730989f201bc3cf2e2d0e6bd98bf76f5374b64e8892e0331cfaeff9d035dc24",
+    "VENDORED.txt": "21cbb1a183992d482e00e3305f3707468e6d3295c6162bc572b2fa46b54f605a",
     "disk-collection.js": "2cc792ec52b0b30816dd78f98ea429c2c688e15fac0137dd0e30fcddb56e83aa",
     "disk-kv.js": "f2c2c2c67d8ae8d7af1049eeec5445213ffcfe181744a99b1ac07cb02289f264",
     "disk-vectors.js": "3beb3d9fa350be8858b0e3001d5e8bddd38b8f0f8b39352675de092fbd9ae6b8",
     "hybrid-merge.js": "736c09f332d18a575864713d1d694bb9ef985b1b42bc0de1e75423949fefbe6a",
-    "index.js": "75e8d33d01f0e75ffce23ac942c459fef2c464bdeb729d0c22fabce555b7c507",
+    "index.js": "d289f6c9d5365f6cdfd0e82ec134252249af49ac41870af2e1ffd81421b12d47",
     "ivf-disk.js": "2640f961a4b3cd4ae105414f677c715c55ee2c044d999a53c5dc192c851500f6",
     "kmeans.js": "a4bc0c75a494eb629202bd175a2a52ad07a624479b54484b35048b995110a768",
     "lock.js": "c51830b080f29cb3921608a52d20e429e902bcb5b490ee29b5aaf324655327f0",
     "metric-l2.js": "c1502cd808e81ba7bd94adb06119738b1a1857c95d3f183ec8a0755a10b23c46",
     "metric-manhattan.js": "02688c6c71b02568fb556bd6ca2b0d9a54351724025579f310815c2e1f8c0ffb",
     "mmr.js": "9d25bedc0f53c9b9779a07b4ac8b023fd3d207ae157b50c88f25f7035e1d508e",
-    "semantic-collection.js": "d8ee728f93a189980027dff248a30011ed6320cb05d5b86a30c5293685f93c2c",
+    "semantic-collection.js": "bf766942bd808b95375d6e1b1e9f7292415d010b4ea7f30da221a442943a89d1",
     "validate.js": "75f6051aa734d5e50885eefada9dd38c1248d80dc1f1f31bb56a19c8b528d0ce",
     "vendor/js-doc-store.js": "4519d361ec1d5baffc620de3cb17b081249eff2a9f7966543faae7850366077c",
     "vendor/js-vector-store.js": "23741d557ec9271a8873658dae7eb2eb634435bda3b43b203789554af47a38d8",
-    "wal.js": "a304ccfba95dabb6c049e8b3ddf64beafeda14b95940394c252cf57ece57f311"
+    "wal.js": "a5bd2c8b7b39bd41ed9f38e5e37bcc46ec187eb0dd25c0a4dbb77ed0bd9ea6e6"
   }
 }

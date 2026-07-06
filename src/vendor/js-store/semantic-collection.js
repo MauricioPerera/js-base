@@ -333,6 +333,13 @@ class SemanticCollection {
   // Transacciones (Fase C): STUBS — los implementa el desarrollador (GLM).
   // Contrato: knowledge/contracts/semantic-collection-tx.md
   begin() {
+    // Guarda de modo: las transacciones son del modo memoria (snapshot en RAM).
+    // En modo disco un upsert dentro de la tx hace fsync directo al log, y rollback
+    // restaura cores en memoria sin tocar _diskVecPath -> estado divergente + la op
+    // persiste al reabrir. Se prohíbe arrancar la tx en disco en lugar de corromper.
+    if (this._diskVecPath != null) {
+      throw new Error("begin: las transacciones solo están disponibles en modo memoria, no en modo disco ({ path })");
+    }
     if (this._tx) throw new Error("transaccion ya activa");
     this._tx = { snapshot: this.serialize(), ops: [] };
   }

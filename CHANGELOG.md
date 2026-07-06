@@ -3,6 +3,15 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.4] — 2026-07-06
+
+### Security / Robustez
+- **Re-vendorizado js-store v0.1.6** (hallazgos H1/H7 de una auditoría externa de js-store):
+  `SemanticCollection.begin()` lanza en modo disco (las transacciones son memory-only; antes
+  divergían disco↔memoria en silencio), y `readOps` del WAL solo tolera un torn tail — una
+  corrupción en el medio del journal ahora lanza en vez de dropear ops sin señal. Manifest
+  sha256 regenerado.
+
 ## [0.1.3] — 2026-07-06
 
 ### Performance

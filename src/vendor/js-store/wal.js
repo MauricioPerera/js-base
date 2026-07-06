@@ -15,18 +15,26 @@ function appendOp(walPath, op) {
   }
 }
 
-// Lee todas las operaciones del WAL. Tolera una última línea incompleta (crash a mitad).
+// Lee todas las operaciones del WAL. Tolera SOLO una última línea incompleta (torn tail
+// por crash a mitad de append). Como el WAL es append-only + fsync por op, una línea que no
+// parsea SOLO puede ser la última con contenido; una corrupta con ops válidas después es
+// corrupción del medio y se señala lanzando (antes se dropeaba en silencio).
 function readOps(walPath) {
   if (!fs.existsSync(walPath)) return [];
   const raw = fs.readFileSync(walPath, "utf8");
   const lines = raw.split("\n");
   const ops = [];
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     if (line === "") continue;
     try {
       ops.push(JSON.parse(line));
     } catch {
-      // Línea torn (crash a mitad de append): se ignora.
+      // Hay contenido después de esta línea? Si sí, es corrupción del medio (no torn tail).
+      if (lines.slice(i + 1).some((l) => l !== "")) {
+        throw new Error(`readOps: WAL corrupto en la línea ${i + 1} (no es la última)`);
+      }
+      break; // torn tail: última línea con contenido, crash a mitad de append -> se tolera.
     }
   }
   return ops;
