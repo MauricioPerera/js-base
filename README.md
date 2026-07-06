@@ -1,5 +1,7 @@
 # js-base
 
+Repositorio: **https://github.com/MauricioPerera/js-base**
+
 **Backend embebido estilo PocketBase con búsqueda semántica nativa, en JavaScript
 puro y cero dependencias de runtime.** REST + auth (JWT) + reglas de acceso por
 colección + realtime (SSE) + búsqueda vectorial e híbrida, todo sobre
@@ -69,6 +71,11 @@ Requisitos: Node ≥18, Python 3.11+. No hay `npm install`: cero dependencias de
   de sistema `_files` se trata como pública en el MVP.
 - Las colecciones se definen vía el registro (`CollectionRegistry`); no hay API de
   administración de schema por HTTP en este MVP.
+
+## Licencia
+
+[MIT](LICENSE) © Mauricio Perera. js-store (vendorizado en `src/vendor/js-store/`)
+se distribuye bajo su propia licencia MIT, incluida en `src/vendor/js-store/LICENSE`.
 
 ---
 
