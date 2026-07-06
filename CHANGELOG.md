@@ -3,6 +3,14 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.3] — 2026-07-06
+
+### Performance
+- **Re-vendorizado js-store v0.1.5**: la carga masiva en modo disco pasa de O(N²) a O(N)
+  (fast-path de clave primaria en `DiskCollection.remove`, que `upsert` invoca por registro).
+  Medido: upsert a 10k docs de ~60 a ~675 docs/s (plano, ya no colapsa). Beneficia
+  directamente al upsert de vectores por HTTP de js-base. Manifest sha256 regenerado.
+
 ## [0.1.2] — 2026-07-06
 
 ### Security

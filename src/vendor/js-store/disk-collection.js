@@ -116,6 +116,22 @@ class DiskCollection {
   }
 
   remove(filter) {
+    // Fast-path por clave primaria {_id: primitivo}: el _id es la clave del DiskKV, así que
+    // get/delete son O(1) vía su índice. Evita el _scan O(N) por upsert en cargas masivas
+    // (O(N^2) -> O(N)). Semántica idéntica al camino por escaneo: mismo retorno y estado final.
+    const fkeys = filter ? Object.keys(filter) : [];
+    if (
+      fkeys.length === 1 &&
+      fkeys[0] === "_id" &&
+      (typeof filter._id === "string" || typeof filter._id === "number")
+    ) {
+      const doc = this._kv.get(filter._id); // O(1) vía índice del KV
+      if (doc == null) return 0; // no existe: sin tombstone, sin escaneo
+      this._kv.delete(filter._id); // O(1) (tombstone)
+      this._removeFromIndexes(doc);
+      return 1;
+    }
+
     // Igualdad simple sobre campo indexado: resuelve los docs a borrar por índice sin escanear.
     const ids = this._indexLookup(filter);
     const toDelete = ids ? ids.map((id) => this._kv.get(id)) : [];
