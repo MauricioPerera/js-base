@@ -1,27 +1,78 @@
 # js-base
 
-js-base es un backend estilo PocketBase (REST + auth + rules + SSE + búsqueda
-semántica) construido sobre [js-store](https://github.com/MauricioPerera/js-store),
-con cero dependencias de runtime y metodología KDD. js-store v0.1.2 está vendorizado
-y congelado en `src/vendor/js-store/`; su integridad se verifica por hash en CI.
+**Backend embebido estilo PocketBase con búsqueda semántica nativa, en JavaScript
+puro y cero dependencias de runtime.** REST + auth (JWT) + reglas de acceso por
+colección + realtime (SSE) + búsqueda vectorial e híbrida, todo sobre
+[js-store](https://github.com/MauricioPerera/js-store) (v0.1.3, vendorizado y
+congelado en `src/vendor/js-store/`; su integridad se verifica por hash en CI).
 
-## Quickstart
+Su diferenciador frente a PocketBase: cada colección puede tener embeddings y
+responder búsquedas por similitud vectorial o híbrida (vector + BM25) sin ningún
+servicio externo. Su alcance es un solo proceso (1 escritor + N lectores), pensado
+para apps chicas/medianas y agentes.
+
+## Correr el servidor
 
 ```bash
-# JS smoke tests (memoria + persistencia en disco)
+# El SECRET es obligatorio (mínimo 16 chars); sin él el server no arranca.
+SECRET="cambia-esto-por-un-secreto-largo" DATA_DIR=./data PORT=3000 npm start
+# → js-base escuchando en :3000
+```
+
+Programáticamente:
+
+```js
+const { createServer } = require("js-base");
+const srv = await createServer({ dataDir: "./data", secret: process.env.SECRET });
+await srv.listen(3000);
+// ...
+await srv.close();
+```
+
+### API HTTP
+
+| Área | Endpoints |
+|---|---|
+| Auth | `POST /api/auth/register` · `/login` · `/logout` · `GET /api/auth/me` · `POST /api/auth/change-password` |
+| Records (CRUD) | `GET/POST /api/collections/:col/records` · `GET/PATCH/DELETE /api/collections/:col/records/:id` |
+| Files | `POST/GET/DELETE /api/files/:name` |
+| Búsqueda semántica | `POST /api/collections/:col/vectors` · `/search` · `/search/hybrid` · `DELETE .../vectors/:id` · `POST .../reindex` |
+| Realtime | `GET /api/realtime/:collection` (SSE) |
+
+Autenticación por `Authorization: Bearer <token>`. Las reglas de acceso por
+colección/operación se evalúan con filtros tipo Mongo sobre `{ auth, record, request }`
+(deny por defecto; `{ "auth.id": { "$exists": true } }` exige login).
+
+## Desarrollo
+
+```bash
+# Suite JS completa (incluye e2e de integración y el harness adversarial)
 node --test
 
-# Validadores KDD (Python, stdlib — sin npm install)
+# Validadores KDD + suite Python (stdlib — sin npm install)
 python scripts/validate_contracts.py knowledge/contracts
-python scripts/validate_specs.py specs
 python scripts/validate_okf.py knowledge
-
-# Suite Python completa (incluye tests/test_vendor_sync.py)
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Requisitos: Node ≥18, Python 3.11+. No hay `npm install`: cero dependencias de
-runtime; el vendor y sus tests viven en el repo.
+Requisitos: Node ≥18, Python 3.11+. No hay `npm install`: cero dependencias de runtime.
+
+## Límites conocidos
+
+- **Un solo proceso** (1 escritor + N lectores): no hay multi-escritor ni cluster.
+- **Sin ACID multi-documento en disco**: las transacciones de js-store son del modo
+  memoria (límite heredado). Operaciones que abarquen varias colecciones no son atómicas.
+- **`searchHybrid` materializa documentos en RAM** en modo disco (caveat heredado de
+  js-store): la búsqueda vectorial pura con IVF sí escala en disco.
+- **Sin admin UI ni OAuth2** en este MVP (solo email/password).
+- **Files**: la lectura es pública; escritura/borrado pasan por reglas, pero la colección
+  de sistema `_files` se trata como pública en el MVP.
+- Las colecciones se definen vía el registro (`CollectionRegistry`); no hay API de
+  administración de schema por HTTP en este MVP.
+
+---
+
+Debajo, la metodología **KDD** con la que se construyó este repo.
 
 [English](#english) | [Español](#español)
 
