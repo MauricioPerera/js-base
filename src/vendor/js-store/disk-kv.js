@@ -17,15 +17,25 @@ class DiskKV {
   }
 
   // Reconstruye el indice escaneando el log de principio a fin (sin retener valores).
+  // Tolera un registro TORN al final (crash mid-append): chequea limites antes de leer
+  // (header incompleto: pos+4>size; payload incompleto: pos+4+N>size) y CORTA el barrido
+  // en el primer registro incompleto, igual que refresh(). Tras un tail torn, TRUNCA el
+  // archivo al último offset bueno para que el log quede limpio y los appends siguientes
+  // (que escriben en fstat().size) no dejen los bytes torn stranded en el medio.
+  // append-only: un crash mid-append solo puede tornar el último registro; lo previo está
+  // fsynced e intacto. Esta truncación es recuperación del ESCRITOR al reabrir tras crash;
+  // refresh() (camino del lector) NO trunca y debe seguir sin truncar.
   _scan() {
     const size = fs.fstatSync(this._fd).size;
     let pos = 0;
+    let lastGoodEnd = 0;
     while (pos < size) {
+      if (pos + 4 > size) break;                       // header incompleto (torn): cortar
       const N = this._readAt(pos, 4).readUInt32BE(0);
-      pos += 4;
-      const payloadOffset = pos;
-      const rec = JSON.parse(this._readAt(pos, N).toString("utf8"));
-      pos += N;
+      if (pos + 4 + N > size) break;                   // payload incompleto (torn): no avanzar, cortar
+      const payloadOffset = pos + 4;
+      const rec = JSON.parse(this._readAt(payloadOffset, N).toString("utf8"));
+      pos = pos + 4 + N;
       if (rec.deleted) {
         this._deleted.add(rec.key);
         this._index.delete(rec.key);
@@ -33,7 +43,9 @@ class DiskKV {
         this._index.set(rec.key, { offset: payloadOffset, length: N });
         this._deleted.delete(rec.key);
       }
+      lastGoodEnd = pos;                               // avanza SOLO tras un registro completo
     }
+    if (lastGoodEnd < size) fs.ftruncateSync(this._fd, lastGoodEnd);
   }
 
   // Lee exactamente `length` bytes desde `offset` (IO posicionado, no carga el archivo).

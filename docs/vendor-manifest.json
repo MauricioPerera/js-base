@@ -1,13 +1,14 @@
 {
-  "source": "MauricioPerera/js-store@642a52c",
+  "source": "MauricioPerera/js-store@3cb455e",
+  "version": "0.1.3",
   "files": {
     "LICENSE": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685",
-    "VENDORED.txt": "d679d7c82ef4cb332af337b22646134a0ddb48901e53ffbd201d589fdc575e28",
+    "VENDORED.txt": "32110395486401767d19627af681338ffb6f14b00c15f37f9dd478b90d9ec726",
     "disk-collection.js": "cc4dcf1ab82c3a9c816925c1f4ffe3fb4cab045f97a1330afe2e0e7ff536d708",
-    "disk-kv.js": "32078709f665b89b034a50b0f588520b2123e167361ef047fd0f3edffb158825",
+    "disk-kv.js": "f2c2c2c67d8ae8d7af1049eeec5445213ffcfe181744a99b1ac07cb02289f264",
     "disk-vectors.js": "3beb3d9fa350be8858b0e3001d5e8bddd38b8f0f8b39352675de092fbd9ae6b8",
     "hybrid-merge.js": "736c09f332d18a575864713d1d694bb9ef985b1b42bc0de1e75423949fefbe6a",
-    "index.js": "922544e6a2b231ecde102b3404951682a7ce6aeac21e8d5b5f79973a989d1629",
+    "index.js": "92cb3341f7370db59c7316b161b615b17f0a9fcafed71fce056389c51249bca3",
     "ivf-disk.js": "2640f961a4b3cd4ae105414f677c715c55ee2c044d999a53c5dc192c851500f6",
     "kmeans.js": "a4bc0c75a494eb629202bd175a2a52ad07a624479b54484b35048b995110a768",
     "lock.js": "c51830b080f29cb3921608a52d20e429e902bcb5b490ee29b5aaf324655327f0",
