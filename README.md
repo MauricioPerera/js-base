@@ -47,6 +47,117 @@ Autenticación por `Authorization: Bearer <token>`. Las reglas de acceso por
 colección/operación se evalúan con filtros tipo Mongo sobre `{ auth, record, request }`
 (deny por defecto; `{ "auth.id": { "$exists": true } }` exige login).
 
+## Ejemplos de uso
+
+### 1. Definir colecciones y arrancar
+
+Las colecciones se declaran por código con `CollectionRegistry` (no hay API HTTP de
+schema en el MVP). Este script registra una colección de documentos protegida por login
+y una colección con embeddings, y deja el server escuchando:
+
+```js
+// server.js
+const { createServer } = require("js-base");
+
+(async () => {
+  const srv = await createServer({ dataDir: "./data", secret: process.env.SECRET });
+
+  // Colección de notas: crear/editar/borrar exige login; lectura pública.
+  srv.registry.create({
+    name: "notes",
+    fields: [
+      { name: "title", type: "string", required: true },
+      { name: "body", type: "string" },
+    ],
+    rules: {
+      list: null, view: null,
+      create: { "auth.id": { $exists: true } },
+      update: { "auth.id": { $exists: true } },
+      delete: { "auth.id": { $exists: true } },
+    },
+    vector: null,
+  });
+
+  // Colección semántica: documentos con embedding de dimensión 3.
+  srv.registry.create({
+    name: "docs",
+    fields: [{ name: "text", type: "string" }],
+    rules: { list: null, view: null, create: null, update: null, delete: null },
+    vector: { dim: 3 },
+  });
+
+  await srv.listen(3000);
+  console.log("listo en :3000");
+})();
+```
+
+```bash
+SECRET="cambia-esto-por-un-secreto-largo" node server.js
+```
+
+### 2. Auth (registro y login)
+
+```bash
+# Registro → 201 { "user": { ... } }
+curl -s -X POST localhost:3000/api/auth/register \
+  -H 'content-type: application/json' \
+  -d '{"email":"ada@example.com","password":"contrasena-larga-123"}'
+
+# Login → { "token": "...", "user": { ... } }
+TOKEN=$(curl -s -X POST localhost:3000/api/auth/login \
+  -H 'content-type: application/json' \
+  -d '{"email":"ada@example.com","password":"contrasena-larga-123"}' \
+  | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+```
+
+### 3. Records (CRUD con reglas)
+
+```bash
+# Sin token → 403 (la regla create exige login)
+curl -s -o /dev/null -w '%{http_code}\n' -X POST localhost:3000/api/collections/notes/records \
+  -H 'content-type: application/json' -d '{"title":"hola"}'          # → 403
+
+# Con token → 201, devuelve el doc creado con su _id
+curl -s -X POST localhost:3000/api/collections/notes/records \
+  -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"title":"hola","body":"mi primera nota"}'
+
+# Listar (público) → { "page":1, "perPage":30, "totalItems":1, "items":[ ... ] }
+curl -s localhost:3000/api/collections/notes/records
+# Filtro tipo Mongo + paginación:
+curl -s 'localhost:3000/api/collections/notes/records?filter=%7B%22title%22%3A%22hola%22%7D&page=1&perPage=10'
+```
+
+### 4. Búsqueda semántica (el diferenciador)
+
+```bash
+# Insertar vectores (dim 3)
+curl -s -X POST localhost:3000/api/collections/docs/vectors -H 'content-type: application/json' \
+  -d '{"id":"gato","doc":{"text":"felino"},"vector":[1,0,0]}'
+curl -s -X POST localhost:3000/api/collections/docs/vectors -H 'content-type: application/json' \
+  -d '{"id":"perro","doc":{"text":"canino"},"vector":[0,1,0]}'
+
+# Buscar por similitud → { "items":[ { "id","score","doc" }, ... ] } rankeado
+curl -s -X POST localhost:3000/api/collections/docs/search \
+  -H 'content-type: application/json' -d '{"vector":[0.9,0.1,0],"limit":2}'
+# → el más cercano es "gato"
+
+# Híbrida (vector + BM25 sobre un campo de texto)
+curl -s -X POST localhost:3000/api/collections/docs/search/hybrid \
+  -H 'content-type: application/json' \
+  -d '{"vector":[0.9,0.1,0],"query":"felino","textField":"text","limit":2}'
+```
+
+### 5. Realtime (SSE)
+
+```bash
+# En una terminal: suscribirse a los eventos de la colección
+curl -N localhost:3000/api/realtime/notes
+# Cada create/update/delete en "notes" llega como:
+#   event: create
+#   data: {"collection":"notes","op":"create","record":{ ... }}
+```
+
 ## Desarrollo
 
 ```bash
