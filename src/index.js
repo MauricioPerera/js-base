@@ -13,4 +13,5 @@
 
 module.exports = {
   store: require("./vendor/js-store/index.js"),
+  createServer: require("./app.js").createServer,
 };
