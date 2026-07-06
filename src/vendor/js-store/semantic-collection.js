@@ -340,6 +340,11 @@ class SemanticCollection {
     }
     // Snapshot atómico primero, luego truncar el WAL (crash entre ambos = replay idempotente).
     this.saveToFile(this.snapshotPath);
+    if (this.walPath == null) {
+      throw new Error(
+        "checkpoint: no hay walPath (pasa { walPath } a openDurable para habilitar checkpoint)"
+      );
+    }
     fs.writeFileSync(this.walPath, "");
     return this.snapshotPath;
   }

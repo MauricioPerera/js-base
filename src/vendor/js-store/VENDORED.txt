@@ -1,1 +1,1 @@
-js-store @ b1c2127 (v0.1.7) — vendored 2026-07-06. DO NOT edit here: update by re-vendoring.
+js-store @ f9f30b5 (v0.1.8) — vendored 2026-07-06. DO NOT edit here: update by re-vendoring.

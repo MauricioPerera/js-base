@@ -1,6 +1,6 @@
 {
   "name": "js-base",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "description": "Backend estilo PocketBase (REST + auth + rules + SSE + búsqueda semántica) sobre js-store, con cero dependencias de runtime y metodología KDD.",
   "main": "src/index.js",

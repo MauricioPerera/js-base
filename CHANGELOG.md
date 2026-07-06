@@ -3,6 +3,14 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.6] — 2026-07-06
+
+### Robustez / Docs
+- **Re-vendorizado js-store v0.1.8** (3ª auditoría de js-store): A1 `checkpoint()` sin walPath lanza
+  error de dominio (espejo de H4); A8 `compact()` maneja el fallo de `renameSync` (la instancia sigue
+  usable) y limpia `.compact` huérfanos; A2/A4 correcciones de claims (atomicidad de commit acotada,
+  equivalencia índice↔escaneo corregida para tipos mixtos). Manifest sha256 regenerado.
+
 ## [0.1.5] — 2026-07-06
 
 ### Robustez

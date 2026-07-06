@@ -10,6 +10,10 @@ class DiskKV {
     this._path = dataPath;
     this._index = new Map(); // key -> { offset, length } (offset del payload)
     this._deleted = new Set();
+    // Limpia un "<dataPath>.compact" huerfano de un compact que crasheo antes del rename.
+    // Siempre es basura parcial (el archivo real es dataPath); seguro de borrar.
+    const orphan = dataPath + ".compact";
+    if (fs.existsSync(orphan)) { try { fs.unlinkSync(orphan); } catch {} }
     if (!fs.existsSync(dataPath)) fs.writeFileSync(dataPath, "");
     this._fd = fs.openSync(dataPath, "r+");
     this._scan();
@@ -129,7 +133,19 @@ class DiskKV {
     fs.fsyncSync(fd);
     fs.closeSync(fd);
     fs.closeSync(this._fd);           // cierra el fd viejo
-    fs.renameSync(tmp, this._path);   // reemplazo atomico
+    try {
+      fs.renameSync(tmp, this._path); // reemplazo atomico
+    } catch (e) {
+      // El rename fallo (p.ej. EPERM en Windows si un lector tiene el archivo abierto):
+      // el archivo original sigue intacto (el rename no ocurrio) -> reabrirlo deja la
+      // instancia USABLE sin compactar. Limpia el tmp huerfano y lanza un Error de dominio.
+      // this._index/_deleted/_scanPos NO se mutaron: siguen apuntando al archivo original.
+      this._fd = fs.openSync(this._path, "r+");
+      try { fs.unlinkSync(tmp); } catch {}
+      throw new Error(
+        `compact: no se pudo reemplazar el archivo (${e.code || e.message}); la coleccion sigue usable sin compactar (cerra lectores abiertos y reintenta)`
+      );
+    }
     this._fd = fs.openSync(this._path, "r+");
     this._index = newIndex;
     this._deleted = new Set();
