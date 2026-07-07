@@ -15,6 +15,9 @@ responder búsquedas por similitud vectorial o híbrida (vector + BM25) sin ning
 servicio externo. Su alcance es un solo proceso (1 escritor + N lectores), pensado
 para apps chicas/medianas y agentes.
 
+> 🧩 **Ecosistema completo** (js-doc-store → js-store → js-base + js-vector-store):
+> [`docs/ECOSYSTEM.md`](docs/ECOSYSTEM.md) — qué es cada capa y cuál usar.
+>
 > 📄 **Reporte de análisis** de la jornada (cubre los tres repos de la cadena
 > js-doc-store → js-store → js-base):
 > [`docs/reports/ANALISIS-2026-07-06.md`](docs/reports/ANALISIS-2026-07-06.md).
