@@ -7,6 +7,8 @@ componente corre solo, sin `npm install` de dependencias.
 
 ```
 js-base          Backend estilo PocketBase: REST + auth JWT + reglas + realtime (SSE) + búsqueda semántica
+  ├── agent/     Capa de agente LLM con contexto dinámico: memoria en colecciones de js-base,
+  │              contexto por slots (caché KV amigable), corrección por supersede, compactación
   └── vendoriza js-store
                  Integración doc+vector: SemanticCollection, persistencia en disco, IVF, WAL, transacciones
         ├── vendoriza js-doc-store
@@ -22,7 +24,7 @@ js-base          Backend estilo PocketBase: REST + auth JWT + reglas + realtime 
 | **js-doc-store** | Core documental (1 archivo) | Queries estilo MongoDB, índices (hash/sorted/text), joins, aggregation, full-text search, graph traversal, field encryption, JWT auth. Corre en Node, browser, Cloudflare Workers, Deno, Bun. | [MauricioPerera/js-doc-store](https://github.com/MauricioPerera/js-doc-store) |
 | **js-vector-store** | Core vectorial | Almacén de embeddings: cuantización, IVF, BM25, `HybridSearch`, reranking. | [MauricioPerera/js-vector-store](https://github.com/MauricioPerera/js-vector-store) |
 | **js-store** | Integración doc+vector | `SemanticCollection` (documento + embedding unificados), búsqueda vectorial e híbrida, persistencia en disco (no depende de RAM), índice IVF, WAL + transacciones, lock 1-escritor. Vendoriza los dos cores. | [MauricioPerera/js-store](https://github.com/MauricioPerera/js-store) |
-| **js-base** | Backend (aplicación) | Servidor estilo PocketBase: REST (records/auth/files), reglas de acceso por colección, realtime por SSE, y **búsqueda semántica por HTTP**. Un solo proceso, cero dependencias. Vendoriza js-store. | [MauricioPerera/js-base](https://github.com/MauricioPerera/js-base) |
+| **js-base** | Backend (aplicación) | Servidor estilo PocketBase: REST (records/auth/files), reglas de acceso por colección, realtime por SSE, y **búsqueda semántica por HTTP**. Incluye la capa **`agent/`**: agente LLM con memoria dinámica sobre las propias colecciones (embeddings vía Ollama, contexto ensamblado por slots, corrección por *supersede*, compactación con promoción de hechos; demo en `examples/agent-demo.js`). Un solo proceso, cero dependencias. Vendoriza js-store. | [MauricioPerera/js-base](https://github.com/MauricioPerera/js-base) |
 
 > El diferenciador de la familia frente a alternativas como PocketBase: **búsqueda semántica nativa**
 > (vectorial e híbrida vector + BM25) sin ningún servicio externo, en cualquier runtime de JavaScript.
@@ -35,6 +37,9 @@ js-base          Backend estilo PocketBase: REST + auth JWT + reglas + realtime 
   con persistencia en disco opcional → **js-store**.
 - **Un backend listo** con REST, auth, reglas y realtime **más** búsqueda semántica, para apps
   chicas/medianas o agentes → **js-base**.
+- **Un agente LLM con memoria persistente** (log de interacciones + conocimiento curado,
+  contexto presupuestado por turno, correcciones que prevalecen sin editar la historia) →
+  la capa **`agent/` de js-base**.
 
 ## Cómo se componen (modelo de vendoring)
 
@@ -47,13 +52,13 @@ Cada capa **copia** a la de abajo dentro de `src/vendor/` y **congela** esa copi
 - **Aislamiento**: editar un archivo vendorizado rompe el test de sincronía; los fixes van **upstream**
   (en el repo de origen) y se **re-vendorizan** hacia arriba.
 
-## Estado (2026-07-06)
+## Estado (2026-07-11)
 
 | Componente | Versión | Tests | CI |
 |---|---|---|---|
 | js-doc-store | v1.2.1 | verde | — |
 | js-store | v0.1.9 | 319 verde | success |
-| js-base | v0.1.6 | 180 verde | success |
+| js-base | v0.1.7 | 237 verde | success |
 
 Los tres repos pasaron auditorías externas (21 hallazgos entre las tres, todos fixeados o
 documentados según severidad). Detalle completo en el
