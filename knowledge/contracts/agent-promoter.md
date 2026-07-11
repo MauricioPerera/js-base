@@ -55,17 +55,27 @@ const promoter = makePromoter({
 - Orden de efectos de `maybeCompact` (fijado por recuperabilidad ante crash):
   (1) upsert de nodos promovidos en `nodes` (embebidos como documento, en lote),
   (2) update del resumen en `sessions` (summary, summary_tokens, last_compaction_seq),
-  (3) marcar turnos `compacted: true` AL FINAL. Un crash entre pasos deja historial
-  sin marcar -> la próxima corrida re-compacta (ids de nodo deterministas
-  `${sessionId}:c${last_compaction_seq}:${i}` la hacen idempotente, upsert pisa).
+  (3) marcar turnos `compacted: true` AL FINAL — en AMBOS lados: colección semántica y
+  espejo documental `stores.get('turns')` (invariante compartido, ver CONTRACT-11;
+  espejo ausente en fixtures se tolera). Un crash entre pasos deja historial sin marcar
+  -> la próxima corrida re-compacta. Ids de nodo deterministas DERIVADOS DEL BATCH
+  (CONTRACT-11): `${sessionId}:c${seq}:${i}` con `seq = max(turno.seq)` de los turnos
+  vivos compactados — retry del mismo batch reusa ids (idempotente, upsert pisa);
+  compactación nueva tiene seqs mayores -> ids nuevos sin pisar los anteriores.
+  `sessions.last_compaction_seq` persiste ese seq (entero).
 - Respuesta del `llm` que no parsea como JSON con `summary` string y `facts` array ->
   `Error` con `code: 'PROMOTER'` y CERO escrituras (todo-o-nada en la frontera del LLM).
 - Los nodos promovidos llevan `source_turns` con los ids de los turnos que los
   originaron y `created_at` derivado del `now` recibido (nunca reloj interno).
 - `supersede`: el nodo viejo debe existir (`NOT_FOUND` si no); el nuevo se embebe y
-  upserta ANTES de marcar el viejo (si el marcado falla, el retry es idempotente);
-  el nuevo nace sin `superseded_by`. Cadenas A<-B<-C válidas: solo el último queda
-  recuperable.
+  upserta ANTES de marcar el viejo. `newId` DETERMINISTA (CONTRACT-11): derivado por
+  sha256 de `(oldId, correction.body)` — mismo par, mismo id, así el retry tras un
+  fallo del marcado re-upserta el mismo nodo sin duplicar (idempotencia real). El nuevo
+  nace sin `superseded_by`. Cadenas A<-B<-C válidas: solo el último queda recuperable.
+- SOLO API PÚBLICA del vendor (CONTRACT-11): prohibido acceder a `vectorStore`, `col` u
+  otros internos de la SemanticCollection; los vectores necesarios para re-upsertar se
+  leen vía `serialize()` (una llamada por batch, helper único `vectorsOf`). Prohibido
+  re-embeber para el marcado (los contadores del embedder están congelados en tests).
 - `maybeCompact` con umbral no superado NO llama al `llm` (los tests cuentan llamadas).
 - El promoter NO arma prompts de usuario final ni decide CUÁNDO correr (eso es del
   loop); solo evalúa el umbral cuando lo llaman.

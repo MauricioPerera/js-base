@@ -60,6 +60,12 @@ const ingestor = makeIngestor({ stores, semanticStores, embedder });
   no llama a `Date.now()` (mismo criterio de determinismo que el assembler).
 - Los embeddings de ambos textos se piden en UN solo lote al embedder con
   `isQuery: false` (prefijo documento): 1 llamada, 2 vectores.
+- ESPEJO DOCUMENTAL (invariante compartido con agent-assembler y agent-promoter,
+  formalizado por CONTRACT-11): cada doc de turno se escribe ADEMÁS en
+  `stores.get('turns')` (lado documental) con el MISMO id, inmediatamente después de su
+  upsert semántico, de forma idempotente (get -> update | insert). El assembler lee el
+  historial S2 y `lastTurnAt` de ese espejo; el promoter marca `compacted` en ambos
+  lados. Los lectores toleran fixtures que no pueblan el espejo.
 - Validación antes de cualquier escritura: argumento faltante o de tipo incorrecto ->
   `Error` con `code: 'VALIDATION'` y CERO escrituras (no hay ingesta parcial evitable).
 - Si el upsert del assistant falla tras el del user, el error burbujea con

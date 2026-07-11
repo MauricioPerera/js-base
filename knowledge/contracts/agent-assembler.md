@@ -61,6 +61,10 @@ const assembler = makeAssembler({
 - Orden FIJO de slots: S0 system+índice de nodos pinned, S1 resumen vigente de la sesión,
   S2 historial vivo (turns de la sesión con compacted != true, orden por seq ascendente,
   append-only), S3 retrieval del turno, S4 turno actual. Nunca se reordena.
+- FUENTE DE S2 (invariante del espejo documental, formalizado por CONTRACT-11): el
+  historial y `lastTurnAt` se leen de `stores.get('turns')` — el espejo documental que
+  el ingestor mantiene con los mismos ids que la colección semántica y que el promoter
+  marca al compactar. El assembler NO lee turnos de la colección semántica.
 - Modo: `esporadico` si `now - lastTurnAt > config.ttl_ms` (o si la sesión no tiene
   turnos previos... NO: sesión nueva sin turnos = interactivo con S2 vacío). En modo
   esporádico S2 se OMITE (slot presente en el reporte con `included: false`).
