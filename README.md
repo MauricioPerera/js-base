@@ -171,6 +171,23 @@ curl -N localhost:3000/api/realtime/notes
 #   data: {"collection":"notes","op":"create","record":{ ... }}
 ```
 
+### 6. Agente con contexto dinámico (capa `agent/`)
+
+Sobre js-base vive un agente LLM con memoria dinámica (CONTRACT-10/11): log de
+interacciones y conocimiento curado en colecciones de js-base, contexto ensamblado por
+slots ordenados por volatilidad (caché KV amigable), corrección por *supersede* sin
+editar la historia, compactación con promoción de hechos y régimen esporádico por TTL.
+
+```bash
+# Demo end-to-end 100% real (requiere Ollama local con embeddinggemma y gemma4):
+node examples/agent-demo.js
+# → retrieval alimenta la inferencia; una corrección posterior PREVALECE sobre lo
+#   dicho antes en el chat; compacta y promueve hechos; sobrevive al reinicio.
+```
+
+Contratos de la capa: `knowledge/contracts/agent-*.md`; ejecución y evidencia:
+`specs/CONTRACT-10*` / `CONTRACT-11*` con sus reportes en `docs/reports/`.
+
 ## Desarrollo
 
 ```bash
