@@ -3,6 +3,30 @@
 Todas las versiones notables de **js-base**. Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado [SemVer](https://semver.org/).
 
+## [0.1.7] — 2026-07-11
+
+### Features
+- **Capa `agent/`: agente LLM con contexto dinámico sobre js-base** (CONTRACT-10, 5
+  módulos con contrato + tests congelados c/u): `embedder` (embeddinggemma vía Ollama,
+  prefijos asimétricos query/documento, caché por hash), `assembler` (contexto por slots
+  S0-S4 ordenados por volatilidad — caché KV amigable —, presupuesto, retrieval híbrido
+  que excluye nodos superseded, guardrails con abort, firma sha256, régimen esporádico
+  por TTL), `ingestor` (persistencia idempotente de turnos + espejo documental),
+  `promoter` (compactación de historial con promoción de hechos a conocimiento;
+  corrección por *supersede* sin editar la historia) y `loop` (orquestador del turno;
+  un turno fallido no persiste estado). 52 tests congelados nuevos; suite total 237.
+- **Demo end-to-end real**: `examples/agent-demo.js` (Ollama local: embeddinggemma +
+  gemma4) — retrieval en la inferencia, corrección que prevalece sobre el chat previo,
+  compactación y continuidad tras reinicio. Mencionado en el README (ejemplo 6).
+
+### Robustez
+- **Hardening del promoter** (CONTRACT-11, baseline rojo verificado en los 3 defectos):
+  `supersede` con id determinista sha256(oldId+body) → retry idempotente sin duplicar;
+  ids de compactación derivados del batch (max seq) → compactaciones sucesivas sin
+  colisión; eliminado todo acceso a internos del vendor (`vectorStore`/`col`) — los
+  vectores se leen por la API pública `serialize()` vía un helper único. El invariante
+  del espejo documental de `turns` quedó formalizado en los contratos de las 3 piezas.
+
 ## [0.1.6] — 2026-07-06
 
 ### Robustez / Docs
